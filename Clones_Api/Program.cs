@@ -40,7 +40,7 @@ namespace Clones_Api
                 {
                     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
                     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                    Seeder.SeedAsync(userManager, roleManager).GetAwaiter().GetResult();
+                    Seeder.SeedAsync(userManager, roleManager, configuration).GetAwaiter().GetResult();
                 }
             }
 
@@ -50,6 +50,7 @@ namespace Clones_Api
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Clones_Api v1"));
             }
 
+            app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             app.UseHttpsRedirection();
             app.UseMiddleware<ExceptionMiddleware>();
             app.UseAuthentication();
