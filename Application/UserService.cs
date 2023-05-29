@@ -67,6 +67,7 @@ namespace Application
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.GivenName, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email)
             };
 

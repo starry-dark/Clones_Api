@@ -18,8 +18,7 @@ namespace Clones_Api
             var configuration = builder.Configuration;
 
             // Add services to the container.
-            builder.Services.AddDbContext<ClonesDbContext>(options =>
-                        options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddDbContextConfigurations(builder.Environment, configuration);
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddTransient<ICredentialService, CredentialService>();
