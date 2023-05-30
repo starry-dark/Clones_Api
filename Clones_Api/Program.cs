@@ -6,6 +6,7 @@ using Data.Context;
 using Data.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Models;
 using Models.Mapping;
 
 namespace Clones_Api
@@ -35,9 +36,10 @@ namespace Clones_Api
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<ClonesDbContext>();
-                if (context.Database.EnsureCreated())
+                context.Database.Migrate();
+                if (context.Database.CanConnect())
                 {
-                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
                     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
                     Seeder.SeedAsync(userManager, roleManager, configuration).GetAwaiter().GetResult();
                 }

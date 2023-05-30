@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.Dtos;
 using Models.Enums;
@@ -37,6 +36,14 @@ namespace Clones_Api.Controllers
         public async Task<IActionResult> GetUsers()
         {
             var result = await _userService.ListUsers();
+            return StatusCode(result.Code, result);
+        }
+
+        [Authorize(Roles = nameof(Roles.Admin))]
+        [HttpPost("deactivate/{id}")]
+        public async Task<IActionResult> DeactivateUser([FromRoute]string id)
+        {
+            var result = await _userService.Deactivate(id);
             return StatusCode(result.Code, result);
         }
     }

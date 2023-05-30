@@ -17,17 +17,17 @@ namespace Clones_Api.Controllers
         }
 
         [HttpPost("addcredential")]
-        public async Task<IActionResult> Add([FromBody]AddCredentialRequest request)
+        public async Task<IActionResult> Add([FromHeader]string tenantId, [FromBody]AddCredentialRequest request)
         {
-            var result = await _credentialService.AddCredential(request);
+            var result = await _credentialService.AddCredential(tenantId, request);
             return Ok(result);
         }
 
         [Authorize]
         [HttpGet("credentials")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromHeader] string tenantId)
         {
-            var result = await _credentialService.GetCredentials();
+            var result = await _credentialService.GetCredentials(tenantId);
             return Ok(result);
         }
 

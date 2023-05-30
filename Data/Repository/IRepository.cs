@@ -5,7 +5,7 @@ namespace Data.Repository
     public interface IRepository
     {
         Task<Credential> AddCredential(Credential credential);
-        Task<IEnumerable<Credential>> GetCredentials();
+        Task<IEnumerable<Credential>> GetCredentials(string tenantId);
         Credential? GetCredential(string id);
         Task<IEnumerable<Credential>> GetCredentialsByIds(List<string> ids);
         Task<bool> DeleteCredentials(IEnumerable<Credential> credentials);

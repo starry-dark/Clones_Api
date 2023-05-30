@@ -1,5 +1,6 @@
 ﻿using Data.Context;
 using Microsoft.AspNetCore.Identity;
+using Models;
 
 namespace Clones_Api.Extensions
 {
@@ -7,9 +8,9 @@ namespace Clones_Api.Extensions
     {
         public static void ConfigureIdentity(this IServiceCollection services)
         {
-            var builder = services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            var builder = services.AddIdentity<User, IdentityRole>(options =>
             {
-                //options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = true;
                 options.Password.RequireDigit = true;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireLowercase = true;

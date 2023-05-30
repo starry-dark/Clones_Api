@@ -45,9 +45,9 @@ namespace Data.Repository
             return _dbSet.SingleOrDefault(x => x.Id.Equals(id));
         }
 
-        public async Task<IEnumerable<Credential>> GetCredentials()
+        public async Task<IEnumerable<Credential>> GetCredentials(string tenantId)
         {
-            return await _dbSet.OrderByDescending(x => x.CreatedOn).ToListAsync();
+            return await _dbSet.Where(x => x.TenantId == tenantId).OrderByDescending(x => x.CreatedOn).ToListAsync();
         }
 
         public async Task<IEnumerable<Credential>> GetCredentialsByIds(List<string> ids)

@@ -5,7 +5,7 @@ using Models;
 
 namespace Data.Context
 {
-    public class ClonesDbContext : IdentityDbContext<IdentityUser>
+    public class ClonesDbContext : IdentityDbContext<User>
     {
         public ClonesDbContext(DbContextOptions<ClonesDbContext> options) : base(options)
         {

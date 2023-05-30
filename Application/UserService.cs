@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Models;
 using Models.Dtos;
 using Models.Enums;
 using System.Data;
@@ -14,11 +15,11 @@ namespace Application
 {
     public class UserService : IUserService
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
 
-        public UserService(UserManager<IdentityUser> userManager, IConfiguration config, IMapper mapper)
+        public UserService(UserManager<User> userManager, IConfiguration config, IMapper mapper)
         {
             _userManager = userManager;
             _config = config;
@@ -27,13 +28,13 @@ namespace Application
 
         public async Task<BaseResponse<string>> Register(RegisterDto user)
         {
-            var identityUser = _mapper.Map<IdentityUser>(user);
+            var identityUser = _mapper.Map<User>(user);
 
             var result = await _userManager.CreateAsync(identityUser, user.Password);
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(identityUser, Roles.User.ToString());
-                return new BaseResponse<string>().Success("Registration successful!");
+                return new BaseResponse<string>().Success("Registration successful!", code:201);
             }
             throw new ArgumentException(string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
         }
@@ -43,6 +44,9 @@ namespace Application
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password))
                 return new BaseResponse<LoginResponse>().Error("Invalid credentials!", code:400);
+
+            if(!user.IsActive)
+                return new BaseResponse<LoginResponse>().Error("Inactive user. Please contact administrator!", code: 400);
 
             var result = new LoginResponse()
             {
@@ -55,14 +59,36 @@ namespace Application
         public async Task<BaseResponse<IEnumerable<UserDto>>> ListUsers()
         {
             var result = await _userManager.GetUsersInRoleAsync(Roles.User.ToString());
-            if(!result.Any())
-                return new BaseResponse<IEnumerable<UserDto>>().Success("No registered users!");
+            var activeUsers = result.Where(x => x.IsActive);
 
-            var users = _mapper.Map<IList<UserDto>>(result);
+            if(!activeUsers.Any())
+                return new BaseResponse<IEnumerable<UserDto>>().Success("No registered active users!");
+
+            var users = _mapper.Map<IEnumerable<UserDto>>(activeUsers);
             return new BaseResponse<IEnumerable<UserDto>>().Success("Users successfully retrieved!", data: users);
         }
 
-        private async Task<string> GenerateToken(IdentityUser user)
+        public async Task<BaseResponse<string>> Deactivate(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return new BaseResponse<string>().Error("No user found!", code: 400);
+            user.IsActive = false;
+            await _userManager.UpdateAsync(user);
+            return new BaseResponse<string>().Success("User deactivated successfully!");
+        }
+
+        public async Task<BaseResponse<string>> Activate(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return new BaseResponse<string>().Error("No user found!", code: 400);
+            user.IsActive = true;
+            await _userManager.UpdateAsync(user);
+            return new BaseResponse<string>().Success("User activated successfully!");
+        }
+
+        private async Task<string> GenerateToken(User user)
         {
             var authClaims = new List<Claim>
             {

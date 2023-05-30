@@ -17,9 +17,13 @@ namespace Application
             _mapper = mapper;
         }
 
-        public async Task<BaseResponse<Credential>> AddCredential(AddCredentialRequest credentialRequest)
+        public async Task<BaseResponse<Credential>> AddCredential(string tenantId, AddCredentialRequest credentialRequest)
         {
+            if(string.IsNullOrWhiteSpace(tenantId))
+                return new BaseResponse<Credential>().Error("Tenant Id is required!", code:400);
+
             var credential = _mapper.Map<Credential>(credentialRequest);
+            credential.TenantId = tenantId;
             var result = await _repository.AddCredential(credential);
             if(result != null)
                 return new BaseResponse<Credential>().Success("Credential added successfully", code:201, data:result);
@@ -49,9 +53,12 @@ namespace Application
             return new BaseResponse<bool>().Error("An error occurred!");
         }
 
-        public async Task<BaseResponse<IEnumerable<Credential>>> GetCredentials()
+        public async Task<BaseResponse<IEnumerable<Credential>>> GetCredentials(string tenantId)
         {
-            var result = await _repository.GetCredentials();
+            if (string.IsNullOrWhiteSpace(tenantId))
+                return new BaseResponse<IEnumerable<Credential>>().Error("Tenant Id is required!", code: 400);
+
+            var result = await _repository.GetCredentials(tenantId);
             return new BaseResponse<IEnumerable<Credential>>().Success("Credentials successfully retrieved!", data: result);
         }
 
