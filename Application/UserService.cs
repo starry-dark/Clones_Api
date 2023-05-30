@@ -94,7 +94,8 @@ namespace Application
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.GivenName, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Sid, user.TenantId)
             };
 
             var roles = await _userManager.GetRolesAsync(user);

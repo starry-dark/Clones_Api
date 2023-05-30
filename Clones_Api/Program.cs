@@ -36,6 +36,7 @@ namespace Clones_Api
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<ClonesDbContext>();
+                context.Database.EnsureDeleted();
                 context.Database.Migrate();
                 if (context.Database.CanConnect())
                 {
