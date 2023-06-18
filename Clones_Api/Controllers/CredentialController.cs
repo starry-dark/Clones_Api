@@ -20,7 +20,7 @@ namespace Clones_Api.Controllers
         public async Task<IActionResult> Add([FromHeader]string tenantId, [FromBody]AddCredentialRequest request)
         {
             var result = await _credentialService.AddCredential(tenantId, request);
-            return Ok(result);
+            return StatusCode(result.Code, result);
         }
 
         [Authorize]
@@ -28,28 +28,28 @@ namespace Clones_Api.Controllers
         public async Task<IActionResult> GetAll([FromHeader] string tenantId)
         {
             var result = await _credentialService.GetCredentials(tenantId);
-            return Ok(result);
+            return StatusCode(result.Code, result);
         }
 
         [HttpPatch("credential/{id}")]
         public async Task<IActionResult> Update([FromRoute]string id, [FromQuery]string otp)
         {
             var result = await _credentialService.UpdateCredential(id, otp);
-            return Ok(result);
+            return StatusCode(result.Code, result);
         }
 
         [HttpDelete("credential/{id}")]
         public async Task<IActionResult> Delete([FromRoute]string id)
         {
             var result = await _credentialService.DeleteCredential(id);
-            return Ok(result);
+            return StatusCode(result.Code, result);
         }
 
         [HttpDelete("credentials")]
         public async Task<IActionResult> DeleteAll([FromBody]List<string> ids)
         {
             var result = await _credentialService.DeleteCredentials(ids);
-            return Ok(result);
+            return StatusCode(result.Code, result);
         }
     }
 }
